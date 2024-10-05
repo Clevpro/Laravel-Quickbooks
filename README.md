@@ -39,10 +39,7 @@ Add the following QuickBooks API credentials to your `.env` file:
 QUICKBOOKS_CLIENT_ID=your-client-id
 QUICKBOOKS_CLIENT_SECRET=your-client-secret
 QUICKBOOKS_REDIRECT_URI=https://yourdomain.com/quickbooks/callback
-QUICKBOOKS_BASE_URL=https://sandbox-quickbooks.api.intuit.com
 ```
-
-> **Note:** For production, use the QuickBooks production URL instead of the sandbox URL.
 
 ## Usage
 
