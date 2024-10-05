@@ -36,6 +36,7 @@ This will create a `config/quickbooks.php` file where you can define your QuickB
 Add the following QuickBooks API credentials to your `.env` file:
 
 ```env
+QUICKBOOKS_SANDBOX=true
 QUICKBOOKS_CLIENT_ID=your-client-id
 QUICKBOOKS_CLIENT_SECRET=your-client-secret
 QUICKBOOKS_REDIRECT_URI=https://yourdomain.com/quickbooks/callback

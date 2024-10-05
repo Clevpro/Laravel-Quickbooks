@@ -15,7 +15,7 @@ class QuickbooksInvoiceService
     {
         $this->client = new Client(
             [
-                'base_uri' => 'https://sandbox-quickbooks.api.intuit.com',
+                'base_uri' => config('quickbooks.sandbox') ? config('quickbooks.sandbox_base_url') : config('quickbooks.base_url'),
             ]
         ); // Initialize Guzzle HTTP Client
         $this->accessToken = $accessToken; // Access token for QuickBooks API
@@ -27,7 +27,7 @@ class QuickbooksInvoiceService
 
         try {
             // Make the POST request to the QuickBooks API
-            $response = $this->client->post("https://sandbox-quickbooks.api.intuit.com/v3/company/{$this->realmId}/invoice", [
+            $response = $this->client->post("/v3/company/{$this->realmId}/invoice", [
                 'headers' => [
                     'Authorization' => "Bearer {$this->accessToken}",
                     'Accept' => 'application/json',

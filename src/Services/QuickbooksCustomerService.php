@@ -11,7 +11,9 @@ class QuickbooksCustomerService
 
     public function __construct($accessToken,  $realmId)
     {
-        $this->client = new Client(); // Initialize Guzzle client
+        $this->client = new Client([
+            'base_uri' => config('quickbooks.sandbox') ? config('quickbooks.sandbox_base_url') : config('quickbooks.base_url'),
+        ]); // Initialize Guzzle client
         $this->accessToken = $accessToken;
         $this->realmId = $realmId;
     }
@@ -34,7 +36,7 @@ class QuickbooksCustomerService
         $accessToken = $this->accessToken;
         $realmId = $this->realmId;
 
-        $response = $this->client->post("https://sandbox-quickbooks.api.intuit.com/v3/company/$realmId/customer", [
+        $response = $this->client->post("/v3/company/$realmId/customer", [
             'headers' => [
                 'Authorization' => "Bearer $accessToken",
                 'Accept' => 'application/json',
@@ -81,7 +83,7 @@ class QuickbooksCustomerService
         $accessToken = $this->accessToken;
         $realmId = $this->realmId;
 
-        $response = $this->client->post("https://sandbox-quickbooks.api.intuit.com/v3/company/$realmId/customer/$customerId", [
+        $response = $this->client->post("/v3/company/$realmId/customer/$customerId", [
             'headers' => [
                 'Authorization' => "Bearer $accessToken",
                 'Accept' => 'application/json',
