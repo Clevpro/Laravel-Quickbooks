@@ -18,7 +18,7 @@
 First, add the package to your project using Composer:
 
 ```bash
-composer require your-vendor/laravel-quickbooks
+composer require clevpro/laravel-quickbooks
 ```
 
 ### 2. Publish the Configuration
