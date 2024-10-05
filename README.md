@@ -26,7 +26,7 @@ composer require clevpro/laravel-quickbooks
 After installing the package, publish the configuration file:
 
 ```bash
-php artisan vendor:publish --provider="YourVendor\LaravelQuickbooks\QuickbooksServiceProvider" --tag=config
+php artisan vendor:publish --provider="Clevpro\LaravelQuickbooks\QuickbooksServiceProvider" --tag=config
 ```
 
 This will create a `config/quickbooks.php` file where you can define your QuickBooks API credentials.
@@ -55,7 +55,7 @@ You will need to authenticate with QuickBooks to get the access token. Redirect 
 To initiate the connection to QuickBooks, call the following service method:
 
 ```php
-use YourVendor\LaravelQuickbooks\Services\QuickbooksOAuthService;
+use Clevpro\LaravelQuickbooks\Services\QuickbooksOAuthService;
 
 $quickbooksOAuthService = new QuickbooksOAuthService();
 $authUrl = $quickbooksOAuthService->generateAuthUrl();
@@ -67,7 +67,7 @@ return redirect($authUrl);
 Handle the callback to exchange the authorization code for access tokens:
 
 ```php
-use YourVendor\LaravelQuickbooks\Services\QuickbooksOAuthService;
+use Clevpro\LaravelQuickbooks\Services\QuickbooksOAuthService;
 use Illuminate\Http\Request;
 
 public function callback(Request $request)
@@ -92,7 +92,7 @@ public function callback(Request $request)
 You can create an invoice by calling the `createInvoice()` method from the `QuickbooksInvoiceService`:
 
 ```php
-use YourVendor\LaravelQuickbooks\Services\QuickbooksInvoiceService;
+use Clevpro\LaravelQuickbooks\Services\QuickbooksInvoiceService;
 
 $quickbooksInvoiceService = new QuickbooksInvoiceService($user->quickbooks_access_token, $user->quickbooks_realm_id);
 
