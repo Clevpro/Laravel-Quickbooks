@@ -83,7 +83,7 @@ class QuickbooksCustomerService
         $accessToken = $this->accessToken;
         $realmId = $this->realmId;
 
-        $response = $this->client->post("/v3/company/$realmId/customer/$customerId", [
+        $response = $this->client->post("/v3/company/$realmId/customer", [
             'headers' => [
                 'Authorization' => "Bearer $accessToken",
                 'Accept' => 'application/json',
@@ -91,7 +91,6 @@ class QuickbooksCustomerService
             ],
             'json' => [
                 "Id" => $customerId,
-                "SyncToken" => "0", // Increment this each time you update the customer
                 "FullyQualifiedName" => $customerData['full_name'],
                 "PrimaryEmailAddr" => [
                     "Address" => $customerData['email']
@@ -117,5 +116,6 @@ class QuickbooksCustomerService
             return null;
         }
     }
+
 
 }
