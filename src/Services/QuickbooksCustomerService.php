@@ -82,6 +82,21 @@ class QuickbooksCustomerService
     public function updateCustomer($customerId, array $customerData)
     {
         try {
+            //get the $syncToken
+            $response = $this->client->get("/v3/company/{$this->realmId}/customer/$customerId", [
+                'headers' => [
+                    'Authorization' => "Bearer {$this->accessToken}",
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ]
+                ]);
+            $customerResp = json_decode((string) $response->getBody(), false);
+
+            if(isset($customerResp->Customer)) {
+                $syncToken = $customerResp->Customer->SyncToken;
+            }else{
+                $syncToken = null;
+            }
             // Make the POST request to the QuickBooks API
             $response = $this->client->post("/v3/company/{$this->realmId}/customer", [
                 'headers' => [
@@ -91,6 +106,7 @@ class QuickbooksCustomerService
                 ],
                 'json' => [
                     "Id" => $customerId,
+                    "SyncToken" => $syncToken,
                     "FullyQualifiedName" => $customerData['full_name'],
                     "PrimaryEmailAddr" => [
                         "Address" => $customerData['email']
@@ -123,6 +139,5 @@ class QuickbooksCustomerService
             return  $e->getMessage();
         }
     }
-
 
 }
