@@ -10,7 +10,7 @@ class QuickbooksCustomerService
     protected $accessToken;
     protected $realmId;
 
-    public function __construct($accessToken,  $realmId)
+    public function __construct($accessToken, $realmId)
     {
         $this->client = new Client([
             'base_uri' => config('quickbooks.sandbox') ? config('quickbooks.sandbox_base_url') : config('quickbooks.base_url'),
@@ -19,12 +19,6 @@ class QuickbooksCustomerService
         $this->realmId = $realmId;
     }
 
-    public function connect()
-    {
-        $OAuth2LoginHelper = $this->dataService->getOAuth2LoginHelper();
-        $authUrl = $OAuth2LoginHelper->getAuthorizationCodeURL();
-        return $authUrl; // Return the OAuth URL so the user can redirect
-    }
 
     /**
      * Create a new customer in QuickBooks.
@@ -52,6 +46,7 @@ class QuickbooksCustomerService
                 "PrimaryPhone" => [
                     "FreeFormNumber" => $customerData['phone']
                 ],
+                "CompanyName" => $customerData['company_name'] ?? '' ,
                 "BillAddr" => [
                     "Line1" => $customerData['address_line1'],
                     "City" => $customerData['city'],
@@ -115,6 +110,7 @@ class QuickbooksCustomerService
                     "PrimaryPhone" => [
                         "FreeFormNumber" => $customerData['phone']
                     ],
+                    "CompanyName" => $customerData['company_name'] ?? '' ,
                     "BillAddr" => [
                         "Line1" => $customerData['address_line1'],
                         "City" => $customerData['city'],
