@@ -37,6 +37,7 @@ class QuickbooksInvoiceService
                     'CustomerRef' => [
                         'value' => $invoiceData['customer_id'],
                     ],
+                    'CustomerMemo' => $invoiceData['customer_memo'],
                     'Line' => $invoiceData['line_items'],
                 ],
             ]);
@@ -122,8 +123,4 @@ class QuickbooksInvoiceService
         // Return the raw PDF data
         return $response->getBody();
     }
-
-
-
-
 }
