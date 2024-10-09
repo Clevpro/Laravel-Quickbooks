@@ -37,7 +37,9 @@ class QuickbooksInvoiceService
                     'CustomerRef' => [
                         'value' => $invoiceData['customer_id'],
                     ],
-                    'CustomerMemo' => $invoiceData['customer_memo'],
+                    'CustomerMemo' => [
+                        'value' => $invoiceData['customer_memo'],
+                    ],
                     'Line' => $invoiceData['line_items'],
                 ],
             ]);
@@ -82,6 +84,9 @@ class QuickbooksInvoiceService
                 "Line" => $invoiceData['line_items'],
                 "CustomerRef" => [
                     "value" => $invoiceData['customer_id']
+                ],
+                'CustomerMemo' => [
+                    'value' => $invoiceData['customer_memo'] ?? '',
                 ],
                 // Additional invoice updates can go here
             ],
