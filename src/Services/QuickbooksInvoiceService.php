@@ -15,7 +15,7 @@ class QuickbooksInvoiceService
     {
         $this->client = new Client(
             [
-                'base_uri' => config('quickbooks.sandbox') ? config('quickbooks.sandbox_base_url') : config('quickbooks.base_url'),
+            'base_uri' => config('quickbooks.sandbox') ? config('quickbooks.sandbox_base_url') : config('quickbooks.base_url'),
             ]
         ); // Initialize Guzzle HTTP Client
         $this->accessToken = $accessToken; // Access token for QuickBooks API
