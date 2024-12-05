@@ -2,8 +2,10 @@
 namespace Clevpro\LaravelQuickbooks\Services;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class QuickbooksOAuthService
 {
@@ -24,6 +26,30 @@ class QuickbooksOAuthService
     {
         $authUrl = $this->generateAuthUrl();
         return $authUrl;
+    }
+
+    public function disconnect($quickbooks_access_token = null, $quickbooks_refresh_token = null)
+    {
+        
+        try {
+            // Step 1: Revoke QuickBooks access token (Optional but recommended)
+            if ($quickbooks_access_token) {
+                $response = $this->client->post('https://developer.api.intuit.com/v2/oauth2/tokens/revoke', [
+                    'auth' => [$this->clientId, $this->clientSecret],
+                    'form_params' => [
+                        'token' => $quickbooks_refresh_token,
+                    ]
+                ]);
+
+                if ($response->getStatusCode() !== 200) {
+                    return true;
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
 
@@ -97,29 +123,39 @@ class QuickbooksOAuthService
      */
     public function refreshAccessToken($refreshToken)
     {
-        $response = $this->client->post('https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer', [
-            'auth' => [$this->clientId, $this->clientSecret],
-            'form_params' => [
-                'grant_type' => 'refresh_token',
-                'refresh_token' => $refreshToken,
-            ]
-        ]);
+        try {
+            $response = $this->client->post('https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer', [
+                'auth' => [$this->clientId, $this->clientSecret],
+                'form_params' => [
+                    'grant_type' => 'refresh_token',
+                    'refresh_token' => $refreshToken,
+                ]
+            ]);
+    
+              // Extract tokens and return them or store them somewhere
+              $tokens = json_decode((string) $response->getBody(), true);
+              if(!$tokens){
+                  return;
+              }
+              $accessToken = $tokens['access_token'];
+              $refreshToken = $tokens['refresh_token'];
+              $expires_in = $tokens['expires_in'];
+              //add 3600 seconds to the current time
+              $expiration = Carbon::now()->addSeconds($expires_in);
+        } catch (ClientException $e) {
+            if ($e->getResponse()->getStatusCode() === 401 || $e->getResponse()->getStatusCode() === 400) {
+                $accessToken = null;
+                $refreshToken = null;
+                $expires_in = 0;
+                //add 3600 seconds to the current time
+                $expiration = Carbon::now()->addSeconds($expires_in);
+            }
+        }
 
-          // Extract tokens and return them or store them somewhere
-          $tokens = json_decode((string) $response->getBody(), true);
-          if(!$tokens){
-              return;
-          }
-          $accessToken = $tokens['access_token'];
-          $refreshToken = $tokens['refresh_token'];
-          $refreshToken = $tokens['refresh_token'];
-          $expires_in = $tokens['expires_in'];
-          //add 3600 seconds to the current time
-          $expiration = Carbon::now()->addSeconds($expires_in);
-          return [
-              'access_token' => $accessToken,
-              'refresh_token' => $refreshToken,
-              'expires_at' => $expiration
-          ];
+        return [
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at' => $expiration
+        ];
     }
 }
