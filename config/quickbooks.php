@@ -7,7 +7,6 @@ return [
     'sandbox' => env('QUICKBOOKS_SANDBOX', false),
     'client_id' => env('QUICKBOOKS_CLIENT_ID'),
     'client_secret' => env('QUICKBOOKS_CLIENT_SECRET'),
-    'webhook_verify_token' => env('QUICKBOOKS_WEBHOOK_TOKEN'),
     'redirect_uri' => env('QUICKBOOKS_REDIRECT_URI'),
     'scope' => 'com.intuit.quickbooks.accounting',
     'base_url' => 'https://quickbooks.api.intuit.com',

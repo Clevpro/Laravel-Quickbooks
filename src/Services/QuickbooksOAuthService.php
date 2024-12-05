@@ -1,4 +1,5 @@
 <?php
+
 namespace Clevpro\LaravelQuickbooks\Services;
 
 use GuzzleHttp\Client;
@@ -10,13 +11,16 @@ use Illuminate\Support\Facades\Log;
 class QuickbooksOAuthService
 {
     protected $client;
+
     protected $clientId;
+
     protected $clientSecret;
+
     protected $redirectUri;
 
     public function __construct()
     {
-        $this->client = new Client(); // Initialize Guzzle client
+        $this->client = new Client; // Initialize Guzzle client
         $this->clientId = config('quickbooks.client_id');
         $this->clientSecret = config('quickbooks.client_secret');
         $this->redirectUri = config('quickbooks.redirect_uri');
@@ -25,12 +29,13 @@ class QuickbooksOAuthService
     public function connect()
     {
         $authUrl = $this->generateAuthUrl();
+
         return $authUrl;
     }
 
     public function disconnect($quickbooks_access_token = null, $quickbooks_refresh_token = null)
     {
-        
+
         try {
             // Step 1: Revoke QuickBooks access token (Optional but recommended)
             if ($quickbooks_access_token) {
@@ -38,7 +43,7 @@ class QuickbooksOAuthService
                     'auth' => [$this->clientId, $this->clientSecret],
                     'form_params' => [
                         'token' => $quickbooks_refresh_token,
-                    ]
+                    ],
                 ]);
 
                 if ($response->getStatusCode() !== 200) {
@@ -48,19 +53,15 @@ class QuickbooksOAuthService
 
             return true;
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
             return false;
         }
     }
 
-
     /**
-     *
      * Handle the callback and exchange the authorization code for tokens.
-     *
-     * @param Request $request
-     *
      */
-
     public function getTokens(Request $request)
     {
         $authorizationCode = $request->input('code');
@@ -68,7 +69,7 @@ class QuickbooksOAuthService
 
         // Extract tokens and return them or store them somewhere
         $tokens = $this->getAccessToken($authorizationCode);
-        if(!$tokens){
+        if (! $tokens) {
             return;
         }
         $accessToken = $tokens['access_token'];
@@ -77,11 +78,12 @@ class QuickbooksOAuthService
         $expires_in = $tokens['expires_in'];
         //add 3600 seconds to the current time
         $expiration = Carbon::now()->addSeconds($expires_in);
+
         return [
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
             'realm_id' => $realmId,
-            'expires_at' => $expiration
+            'expires_at' => $expiration,
         ];
     }
 
@@ -98,7 +100,7 @@ class QuickbooksOAuthService
             'state' => 'random_state_string', // Generate a random state for security
         ]);
 
-        return 'https://appcenter.intuit.com/connect/oauth2?' . $queryParams;
+        return 'https://appcenter.intuit.com/connect/oauth2?'.$queryParams;
     }
 
     /**
@@ -112,7 +114,7 @@ class QuickbooksOAuthService
                 'grant_type' => 'authorization_code',
                 'code' => $authorizationCode,
                 'redirect_uri' => $this->redirectUri,
-            ]
+            ],
         ]);
 
         return json_decode((string) $response->getBody(), true);
@@ -129,19 +131,19 @@ class QuickbooksOAuthService
                 'form_params' => [
                     'grant_type' => 'refresh_token',
                     'refresh_token' => $refreshToken,
-                ]
+                ],
             ]);
-    
-              // Extract tokens and return them or store them somewhere
-              $tokens = json_decode((string) $response->getBody(), true);
-              if(!$tokens){
-                  return;
-              }
-              $accessToken = $tokens['access_token'];
-              $refreshToken = $tokens['refresh_token'];
-              $expires_in = $tokens['expires_in'];
-              //add 3600 seconds to the current time
-              $expiration = Carbon::now()->addSeconds($expires_in);
+
+            // Extract tokens and return them or store them somewhere
+            $tokens = json_decode((string) $response->getBody(), true);
+            if (! $tokens) {
+                return;
+            }
+            $accessToken = $tokens['access_token'];
+            $refreshToken = $tokens['refresh_token'];
+            $expires_in = $tokens['expires_in'];
+            //add 3600 seconds to the current time
+            $expiration = Carbon::now()->addSeconds($expires_in);
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() === 401 || $e->getResponse()->getStatusCode() === 400) {
                 $accessToken = null;
@@ -149,13 +151,15 @@ class QuickbooksOAuthService
                 $expires_in = 0;
                 //add 3600 seconds to the current time
                 $expiration = Carbon::now()->addSeconds($expires_in);
+            } else {
+                Log::error($e->getMessage());
             }
         }
 
         return [
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
-            'expires_at' => $expiration
+            'expires_at' => $expiration,
         ];
     }
 }
